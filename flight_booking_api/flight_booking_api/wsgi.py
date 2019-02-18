@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flight_booking_api.settings')
+setting = 'flight_booking_api.settings.development'
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', setting)
 
 application = get_wsgi_application()

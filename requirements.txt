@@ -1,3 +1,10 @@
 Django==2.1.7
+django-money==0.14.4
 djangorestframework==3.9.1
+djangorestframework-jwt==1.11.0
+Pillow==5.4.1
+psycopg2==2.7.7
+py-moneyed==0.8.0
+PyJWT==1.7.1
+python-dotenv==0.10.1
 pytz==2018.9
