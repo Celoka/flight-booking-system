@@ -14,7 +14,7 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
     
     # create a user
-    def _create_user(self,email,password=None,is_admin=False,is_staff=False,is_active=True):
+    def _create_user(self,email,password=None,is_admin=False,is_staff=False,is_active=True,**extra_fields):
         if not email:
             raise ValueError('Users must have a valid email')
         if not password:
@@ -22,6 +22,7 @@ class UserManager(BaseUserManager):
 
         user_obj = self.model(
            email=self.normalize_email(email),
+           **extra_fields
         )
         user_obj.set_password(password)
         user_obj.staff=is_staff
@@ -29,12 +30,11 @@ class UserManager(BaseUserManager):
         user_obj.save(using=self._db)
         return user_obj
     
-    def create_user(self,first_name,last_name,email,password):
+    def create_user(self,email,password,**extra_fields):
         user = self._create_user(
             email,
-            first_name=first_name,
-            last_name=last_name,
-            password=password
+            password=password,
+            **extra_fields
         )
         user.is_staff=False
         user.is_superuser=False
