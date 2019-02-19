@@ -27,6 +27,23 @@ class BaseViewTest(APITestCase):
             ),
             content_type='application/json'
         )
+    
+    def login_a_user(self, email="",password=""):
+        url = reverse(
+            "auth-login",
+            kwargs={
+                "version": "v1"
+            }
+        )
+        return self.client.post(
+            url,
+            data=json.dumps({
+                "email": email,
+                "password": password
+            }),
+            content_type="application/json"
+        )
+
 
 class RegisterUserTest(BaseViewTest):
     """
@@ -44,3 +61,20 @@ class RegisterUserTest(BaseViewTest):
 
         # assert status code
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class AuthLoginUserTest(BaseViewTest):
+    """
+    Tests for the auth/login/ endpoint
+    """
+
+    def test_login_user_with_valid_credentials(self):
+        self.register_a_user("admin","user","test@email.com","test_admin")
+        response = self.login_a_user("test@email.com", "test_admin")
+        self.assertIn("token", response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # test a user with invalid login credentials
+        response = self.login_a_user("anonymous", "pass")
+
+        # assert status code
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
