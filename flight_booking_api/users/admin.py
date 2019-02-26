@@ -18,24 +18,24 @@ class UserAdmin(BaseUserAdmin):
     add_form = AdminUserChangeForm
 
     # The fields to be used in displaying the User Model
-    list_display = ('id','first_name','last_name','email','is_admin',)
-    list_filter = ('first_name', 'last_name','email',)
+    list_display = ('id','username','first_name','last_name','email',)
+    list_filter = ('username','first_name', 'last_name','email',)
 
     fieldsets = (
-        (None,{'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name','last_name', 'photo')}),
+        (None,{'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('email','first_name','last_name', 'photo')}),
         ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_active','is_superuser',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes':('wide',),
-            'fields': ('phone','password', 'password2')
+            'fields': ('username','password', 'password2')
         }),
     )
 
-    search_fields = ('email','first_name','last_name')
-    ordering = ('email','first_name','last_name')
+    search_fields = ('username','first_name','last_name')
+    ordering = ('username','first_name','last_name')
     filer_horizontal = ()
 
     def get_inline_instances(self,request, obj=None):
@@ -44,7 +44,7 @@ class UserAdmin(BaseUserAdmin):
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
 # Register user model
-admin.site.register(User, )
+admin.site.register(User,UserAdmin )
 
 # Remove Group Model from Admin.
 admin.site.unregister(Group, )

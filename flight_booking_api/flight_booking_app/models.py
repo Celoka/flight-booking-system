@@ -1,7 +1,11 @@
 import uuid
-from django.db import models
+
 from djmoney.models.fields import MoneyField
+
+from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
 
 
 # Create your models here.
@@ -17,14 +21,20 @@ class Flight(models.Model):
         ("CANCELLED","Cancelled")
     )
 
-    flight_no           = models.CharField(max_length=50, blank=True)
-    scheduled_departure = models.DateTimeField(auto_now=True)
-    scheduled_arrival   = models.DateTimeField(auto_now=True)
-    departure_airport   = models.CharField(max_length=50, blank=True)
-    arrival_airport     = models.CharField(max_length=50, blank=True)
-    status              = models.CharField(choices=STATUS, max_length=50, default="AVAILABLE")
-    actual_departure    = models.DateTimeField(auto_now=True)
-    actual_arrival      = models.DateTimeField(auto_now=True)
+    customers = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    flight_number = models.CharField(max_length=50, blank=True,unique=True)
+    depart_date = models.DateField(_(u"Depart Date"), blank=True, null=True)
+    arrive_date = models.DateField(_(u"Arrive Date"), blank=True, null=True)
+    departure = models.CharField(max_length=50, blank=True)
+    destination = models.CharField(max_length=50, blank=True)
+    flight_status = models.CharField(choices=STATUS, max_length=50, default="Available")
+    booked = models.BooleanField(blank=True, null=True,default=False)
+    amount = MoneyField(max_digits=14,decimal_places=2,default_currency='USD',null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "{}".format(self.flight_number)
 
 
 class Ticket(models.Model):
@@ -32,20 +42,14 @@ class Ticket(models.Model):
     Model defines a Ticket object
     """
 
-    STATUS = (
-        ("PENDING","Pending"),
-        ("RESERVED","Reserved"),
-        ("CONFIRMED","Confirmed"),
-        ("BOOKED","Booked")
-    )
-
-    ticket_id   = models.CharField(max_length=50, blank=True)
-    user        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    flight      = models.ForeignKey('flight_booking_app.Flight', on_delete=models.CASCADE, null=True)
-    status      = models.CharField(choices=STATUS, max_length=50, default="PENDING")
-    amount      = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
-    created     = models.DateTimeField(auto_now_add=True)
-    modified    = models.DateTimeField(auto_now=True)
+    flight = models.ForeignKey('flight_booking_app.Flight', on_delete=models.CASCADE)
+    ticket_id = models.CharField(max_length=50, blank=True)
+    date_of_birth = models.DateField(verbose_name='DOB')
+    phone = models.CharField(max_length=50,verbose_name='Phone')
+    passport_number = models.CharField(max_length=50)
+    contact_address = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
 
     def save(self, *args, **kwargs):
@@ -54,10 +58,7 @@ class Ticket(models.Model):
         super(Ticket, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "{}".format(self.ticket_id)
-    
-    class Meta:
-        ordering = ["-created"]
+        return "{}".format(self.flight)
 
 
 def generate_ticket_id():

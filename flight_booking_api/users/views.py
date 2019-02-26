@@ -1,19 +1,25 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 
 from rest_framework import generics, permissions, exceptions
 from rest_framework.response import Response
-from rest_framework.views import status,APIView
+from rest_framework.views import status
 from rest_framework_jwt.settings import api_settings
 
 from .models import User
+from .helper import (check_if_exist,
+                    validate_username,
+                    validate_password,
+                    validate_non_empty_input,
+                    validate_login_input)
+
 from .serializers import (UserSerializer,
                         TokenSerializer,
                         UserLoginSerializer)
 
+
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
 
 
 class RegisterUserView(generics.CreateAPIView):
@@ -22,20 +28,21 @@ class RegisterUserView(generics.CreateAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer
+    queryset = User.objects.all()
 
     def post(self, request, *args, **kwargs):
+        username   = request.data.get("username", "default")
         first_name = request.data.get("first_name", "")
         last_name  = request.data.get("last_name", "")
-        email      = request.data.get("email", "")
+        email      = request.data.get("email", "default")
         password   = request.data.get("password", "")
-        if not first_name and not last_name and not email and not password:
-            return Response(
-                data={
-                    "message": "All user field credentials are required"
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
+        validate_username(username)
+        validate_password(password)
+        check_if_exist(email, username)
+
         new_user = User.objects.create_user(
+            username=username,
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -47,7 +54,6 @@ class RegisterUserView(generics.CreateAPIView):
         )
 
 
-
 class LoginView(generics.CreateAPIView):
     """
     Post auth/login
@@ -57,18 +63,11 @@ class LoginView(generics.CreateAPIView):
 
     queryset = User.objects.all()
 
-    def validate_input(self, request, validated_data):
-        email    = validated_data.get("email")
-        password = validated_data.get("password")
-        if email and password:
-            user = authenticate(request, email=email, password=password)
-            return user
-        message = "Enter a valid login credential"
-        raise exceptions.ValidationError(message)
-
     def post(self, request, *args, **kwargs):
-        user = self.validate_input(request, request.data)
+        user = validate_login_input(request, request.data)
         if user is not None:
+            login(request, user)
+            serializer = UserLoginSerializer(user)
             token_serializer = TokenSerializer(
                 data={
                     "token": jwt_encode_handler(
@@ -78,6 +77,11 @@ class LoginView(generics.CreateAPIView):
             )
             if token_serializer.is_valid():
                 return Response(
-                    data=token_serializer.data,
+                    data={
+                        "id": serializer.data.get('id'),
+                        "username": serializer.data.get('username'),
+                        "token":token_serializer.data,
+
+                    },
                     status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)

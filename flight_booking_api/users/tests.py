@@ -9,7 +9,7 @@ from .models import User
 class BaseViewTest(APITestCase):
     client = APIClient()
 
-    def register_a_user(self,first_name="",last_name="",email="",password=""):
+    def register_a_user(self,username="",first_name="",last_name="",email="",password=""):
         return self.client.post(
             reverse(
                 "auth-register",
@@ -18,7 +18,8 @@ class BaseViewTest(APITestCase):
                 }
             ),
             data=json.dumps(
-                {
+                {   
+                    "username": username,
                     "first_name": first_name,
                     "last_name": last_name,
                     "email": email,
@@ -28,7 +29,7 @@ class BaseViewTest(APITestCase):
             content_type='application/json'
         )
     
-    def login_a_user(self, email="",password=""):
+    def login_a_user(self, username="",password=""):
         url = reverse(
             "auth-login",
             kwargs={
@@ -38,7 +39,7 @@ class BaseViewTest(APITestCase):
         return self.client.post(
             url,
             data=json.dumps({
-                "email": email,
+                "username": username,
                 "password": password
             }),
             content_type="application/json"
@@ -50,7 +51,8 @@ class RegisterUserTest(BaseViewTest):
     Tests for auth/register/endpoint
     """
     def test_register_a_user(self):
-        response = self.register_a_user("admin","user","test@email.com","test_admin")
+        response = self.register_a_user("Test_admin","admin","user","test@email.com","Testadmin1@")
+        self.assertEqual(response.data["username"],"Test_admin")
         self.assertEqual(response.data["first_name"],"admin")
         self.assertEqual(response.data["last_name"],"user")
         self.assertEqual(response.data["email"],"test@email.com")
@@ -68,9 +70,9 @@ class AuthLoginUserTest(BaseViewTest):
     """
 
     def test_login_user_with_valid_credentials(self):
-        self.register_a_user("admin","user","test@email.com","test_admin")
-        response = self.login_a_user("test@email.com", "test_admin")
-        self.assertIn("token", response.data)
+        self.register_a_user("Test","admin","user","test@email.com","Testadmin1@")
+        response = self.login_a_user("Test", "Testadmin1@")
+        self.assertIn("token", response.data["token"])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # test a user with invalid login credentials
