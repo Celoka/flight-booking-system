@@ -14,7 +14,9 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
     
     # create a user
-    def _create_user(self,email,password=None,is_admin=False,is_staff=False,is_active=True,**extra_fields):
+    def _create_user(self,email,
+                    password=None,is_admin=False,
+                    is_staff=False,is_active=True,**extra_fields):
         if not email:
             raise ValueError('Users must have a valid email')
         if not password:
@@ -27,6 +29,7 @@ class UserManager(BaseUserManager):
         user_obj.set_password(password)
         user_obj.staff=is_staff
         user_obj.admin=is_admin
+        user_obj.is_active=is_active
         user_obj.save(using=self._db)
         return user_obj
     
@@ -36,18 +39,18 @@ class UserManager(BaseUserManager):
             password=password,
             **extra_fields
         )
-        user.is_staff=False
         user.is_superuser=False
-        user.is_admin=False
-        user.is_active=True
         user.save(using=self._db)
         return user
 
     # create super admin user
-    def create_superuser(self,email,password,first_name=None,last_name=None):
+    def create_superuser(self,email,password,
+                        first_name=None,last_name=None,
+                        **extra_fields):
         user = self._create_user(
             email,
             password=password,
+            **extra_fields
             )
         user.is_superuser=True
         user.is_admin=True
@@ -61,26 +64,18 @@ class User(AbstractBaseUser,PermissionsMixin):
     """
     User model
     """
-    first_name   = models.CharField(max_length=20, blank=True, null=True)
-    last_name    = models.CharField(max_length=20,blank=True, null=True)
-    email        = models.EmailField(_('email address'), unique=True)
-    photo        = models.ImageField(upload_to='uploads', blank=True)
-    is_staff     = models.BooleanField(default=False)
-    is_active    = models.BooleanField(default=False)
+    username = models.CharField(max_length=20, blank=True,unique=True,null=True)
+    first_name = models.CharField(max_length=20, blank=True, null=True)
+    last_name = models.CharField(max_length=20,blank=True, null=True)
+    email = models.EmailField(_('email address'), unique=True)
+    photo = models.ImageField(upload_to='uploads', blank=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'password']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name', 'last_name','email', 'password']
 
     objects = UserManager()
 
-    def __unicode__(self):
-        return self.email
-
-
-
-# This gets the user id from the User object
-def get_user(user_id):
-    try:
-        return User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        return None
+    def __str__(self):
+        return self.username
