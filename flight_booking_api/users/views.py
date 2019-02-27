@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth import login
 
-from rest_framework import generics, permissions, exceptions
+from rest_framework import generics,permissions,exceptions
 from rest_framework.response import Response
-from rest_framework.views import status
+from rest_framework.views import status,APIView
+from rest_framework.exceptions import ParseError
 from rest_framework_jwt.settings import api_settings
+from rest_framework.parsers import MultiPartParser,FormParser
 
 from .models import User
 from .helper import (check_if_exist,
@@ -15,7 +17,8 @@ from .helper import (check_if_exist,
 
 from .serializers import (UserSerializer,
                         TokenSerializer,
-                        UserLoginSerializer)
+                        UserLoginSerializer,
+                        ImageUploadSerializer)
 
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -84,4 +87,37 @@ class LoginView(generics.CreateAPIView):
 
                     },
                     status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors,
+        status=status.HTTP_401_UNAUTHORIZED)
+
+class ImageUploadViewSet(APIView):
+    """
+    User image upload
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = ImageUploadSerializer
+
+    def post(self, request, *args, **kwargs):
+        
+        try:
+            photo = request.data.get('photo')
+        except KeyError:
+            return ParseError('Field cannot be empty')
+        user = request.user
+        user.photo = photo
+        user.save()
+        serializer = ImageUploadSerializer(user)
+        return Response(data={
+                "data":serializer.data,
+                "message": "Successful Upload"
+            },
+            status=status.HTTP_201_CREATED)
+
+    def delete(self,request, *args, **kwargs):
+        user = request.user
+        user.photo.delete(save=True)
+        return Response(data={
+                "message": "Delete successful"
+            },
+            status=status.HTTP_204_NO_CONTENT)

@@ -1,9 +1,9 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.signals import pre_save
 
-import os
 
 # Create your models here.
 
@@ -68,9 +68,11 @@ class User(AbstractBaseUser,PermissionsMixin):
     first_name = models.CharField(max_length=20, blank=True, null=True)
     last_name = models.CharField(max_length=20,blank=True, null=True)
     email = models.EmailField(_('email address'), unique=True)
-    photo = models.ImageField(upload_to='uploads', blank=True)
+    photo = models.ImageField(upload_to='profile_pics', blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name','email', 'password']
