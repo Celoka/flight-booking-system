@@ -13,12 +13,14 @@ class Flight(models.Model):
     """
     This model defines a Flight object
     """
+    BOOKED = "Booked"
+    RESERVED = "Reserved"
+    PENDING = "Pending"
+ 
     STATUS = (
-        ("AVAILABLE", "Available"),
-        ("ARRIVED","Arrived"),
-        ("DELAYED","Delayed"),
-        ("DEPARTED","Departed"),
-        ("CANCELLED","Cancelled")
+        ("BOOKED","Booked"),
+        ("RESERVED","Reserved"),
+        ("PENDING","Pending")
     )
 
     customers = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -27,8 +29,7 @@ class Flight(models.Model):
     arrive_date = models.DateField(_(u"Arrive Date"), blank=True, null=True)
     departure = models.CharField(max_length=50, blank=True)
     destination = models.CharField(max_length=50, blank=True)
-    flight_status = models.CharField(choices=STATUS, max_length=50, default="Available")
-    booked = models.BooleanField(blank=True, null=True,default=False)
+    flight_status = models.CharField(choices=STATUS, max_length=50, default="Pending")
     amount = MoneyField(max_digits=14,decimal_places=2,default_currency='USD',null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

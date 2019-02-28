@@ -6,5 +6,5 @@ from .views import (RegisterUserView,
 urlpatterns = [
     path('auth/register/', RegisterUserView.as_view(), name="auth-register"),
     path('auth/login/', LoginView.as_view(), name="auth-login"),
-    path('upload/', ImageUploadViewSet.as_view(), name="file-upload")
+    path('user/upload/', ImageUploadViewSet.as_view(), name="file-upload")
 ]
