@@ -68,9 +68,9 @@ class LoginView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         user = validate_login_input(request, request.data)
+        print(user)
         if user is not None:
             login(request, user)
-            serializer = UserLoginSerializer(user)
             token_serializer = TokenSerializer(
                 data={
                     "token": jwt_encode_handler(
@@ -79,15 +79,17 @@ class LoginView(generics.CreateAPIView):
                 }
             )
             if token_serializer.is_valid():
+                serializer = UserLoginSerializer(user)
                 return Response(
                     data={
                         "id": serializer.data.get('id'),
                         "username": serializer.data.get('username'),
-                        "token":token_serializer.data,
-
+                        "token":token_serializer.data
                     },
                     status=status.HTTP_200_OK)
-        return Response(serializer.errors,
+        return Response(data={
+            "error":"Unauthorized operation"
+        },
         status=status.HTTP_401_UNAUTHORIZED)
 
 class ImageUploadViewSet(APIView):
@@ -99,18 +101,17 @@ class ImageUploadViewSet(APIView):
     serializer_class = ImageUploadSerializer
 
     def post(self, request, *args, **kwargs):
-        
         try:
             photo = request.data.get('photo')
         except KeyError:
-            return ParseError('Field cannot be empty')
+            return ParseError('Photo field cannot be empty')
         user = request.user
         user.photo = photo
         user.save()
         serializer = ImageUploadSerializer(user)
         return Response(data={
-                "data":serializer.data,
-                "message": "Successful Upload"
+                "message": "Successful Upload",
+                "data":serializer.data
             },
             status=status.HTTP_201_CREATED)
 
