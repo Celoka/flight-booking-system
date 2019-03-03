@@ -12,13 +12,4 @@ class FlightSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        # extra_kwargs = {'flight_number': {'read_only': True}}
-        fields = (
-            'id',
-            'flight',
-            'ticket_id',
-            'date_of_birth',
-            'phone',
-            'passport_number',
-            'contact_address',
-        )
+        fields = '__all__'

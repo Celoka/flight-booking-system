@@ -68,7 +68,6 @@ class LoginView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         user = validate_login_input(request, request.data)
-        print(user)
         if user is not None:
             login(request, user)
             token_serializer = TokenSerializer(
