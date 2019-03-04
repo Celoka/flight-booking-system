@@ -45,7 +45,7 @@ class Ticket(models.Model):
     flight = models.ForeignKey('flight_booking_app.Flight', on_delete=models.CASCADE)
     ticket_id = models.CharField(max_length=50, blank=True)
     date_of_birth = models.DateField(verbose_name='DOB')
-    date_reserved = models.DateField(verbose_name='Reserved date',blank=True, null=True)
+    date_reserved = models.DateTimeField(verbose_name='Reserved date',blank=True, null=True)
     phone_number = models.CharField(max_length=50,verbose_name='Phone')
     passport_number = models.CharField(max_length=50)
     contact_address = models.CharField(max_length=255)
@@ -65,7 +65,7 @@ class Ticket(models.Model):
         super(Ticket, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "{}".format(self.flight)
+        return "{}".format(self.ticket_id)
 
 
 def generate_ticket_id():

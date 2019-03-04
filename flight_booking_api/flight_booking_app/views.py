@@ -158,7 +158,7 @@ class TicketViewSet(viewsets.ModelViewSet):
                 flight = Flight.objects.get(pk=data['flight_pk'])
                 new_data = dict(
                     amount=flight.amount,
-                    date_reserved=datetime.now().date(),
+                    date_reserved=datetime.now(),
                     status=Ticket.RESERVED
                 )
                 serializer = TicketSerializer()
