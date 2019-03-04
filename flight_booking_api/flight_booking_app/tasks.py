@@ -1,11 +1,17 @@
-from celery import shared_task,task
+from datetime import datetime,timezone
+
+from celery import shared_task
+from celery.schedules import crontab
+from celery.decorators import periodic_task
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
+
 from .models import Ticket
+from users.models import User
 
 
 @shared_task()
@@ -34,6 +40,37 @@ def ticket_notification(pk):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
+
+@periodic_task(
+    run_every=(crontab(hour=1, minute=0)),
+    name="email_reminder_task",
+    ignore_result=True
+)
+def user_departure_notification():
+    current_datetime = datetime.now(timezone.utc)
+    users = User.objects.all()
+    for user in users:
+        ticket = Ticket.objects.filter(user=users[0], status=Ticket.RESERVED)
+        new_ticket = ticket[0]
+        reserved_date = new_ticket.date_reserved
+        age = current_datetime - reserved_date
+        if age.days <= 1:
+            subject = f'Reminder For Departure of Flight {new_ticket.flight}'
+            from_email = settings.EMAIL_HOST_USER
+            to = new_ticket.user.email
+            html_content = render_to_string('flight_reminder.html',{
+                'name': new_ticket.user.get_full_name(),
+                'flight_number': new_ticket.flight,
+                'depart_date': new_ticket.depart_date,
+                'arrive_date': new_ticket.arrive_date,
+                'departure': new_ticket.departure,
+                'destination': new_ticket.destination
+            })
+            text_content = strip_tags(html_content)
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+  
 @shared_task()
 def flight_reservation(pk):
     """ This sends an email to a user when they make a flight reservation """
