@@ -18,6 +18,8 @@ class Flight(models.Model):
     depart_date = models.DateField(_(u"Depart Date"), blank=True, null=True)
     arrive_date = models.DateField(_(u"Arrive Date"), blank=True, null=True)
     departure = models.CharField(max_length=50, blank=True)
+    customers = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True,blank=True)
+    date_reserved = models.DateTimeField(blank=True, null=True)
     amount = MoneyField(max_digits=14,decimal_places=2,default_currency='USD',null=True,blank=True)
     destination = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

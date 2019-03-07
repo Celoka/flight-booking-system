@@ -42,8 +42,7 @@ def check_if_exist(email,username):
     """
     if User.objects.filter(email=email).exists()\
         or User.objects.filter(username=username).exists():
-        return Response(data={'message':'Username or Email already exist'},
-                            status=status.HTTP_409_CONFLICT)
+        raise serializers.ValidationError('Username or Email already exist')
 
 def validate_login_input(request, validated_data):
     """

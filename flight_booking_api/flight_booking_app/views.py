@@ -1,10 +1,7 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 
-
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
-# Create your views here.
 from rest_framework.response import Response
 from rest_framework import viewsets,serializers,exceptions
 from rest_framework.views import status
@@ -14,10 +11,12 @@ from rest_framework.decorators import action
 from .serializer import (FlightSerializer,
                         TicketSerializer)
 from .tasks import (ticket_notification,
-                        flight_reservation)
+                        flight_reservation,
+                        flight_decline)
+from .helper import (validate_request_data, 
+                    convert_date)
 from .models import Flight,Ticket
 from .permissions import IsAdminUser,IsOwner
-from .decorators import validate_request_data
 
 
 class FlightViewSet(viewsets.ModelViewSet):
@@ -83,6 +82,23 @@ class FlightViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, 
+    methods=['GET'], 
+    url_path='reserved_flight/(?P<date>[0-9_-]+)')
+    def get_reserved_fight_status(self, request, version, pk=None, date=None):
+        search_date = convert_date(date)
+        flights = Flight.objects.filter(date_reserved__gte=search_date, 
+                                        date_reserved__lte=search_date+timedelta(hours=24))
+        users = [
+            user for user in flights 
+        ]
+        serializer = FlightSerializer(users, many=True)
+        return Response(
+            data={
+                "reserved_flight": serializer.data,
+                "reserved_flight_count": flights.count()
+            },
+            status=status.HTTP_200_OK)
 
 class TicketViewSet(viewsets.ModelViewSet):
     """
@@ -155,7 +171,8 @@ class TicketViewSet(viewsets.ModelViewSet):
                 return Response(data={"This flight has been reserved"},
                                 status=status.HTTP_409_CONFLICT)
             try:
-                flight = Flight.objects.get(pk=data['flight_pk'])
+                flight_number = ticket.flight.flight_number
+                flight = Flight.objects.get(flight_number=flight_number)
                 new_data = dict(
                     amount=flight.amount,
                     date_reserved=datetime.now(),
@@ -163,6 +180,9 @@ class TicketViewSet(viewsets.ModelViewSet):
                 )
                 serializer = TicketSerializer()
                 updated_ticket = serializer.update(ticket,new_data)
+                flight.customers = user
+                flight.date_reserved = ticket.date_reserved
+                flight.save()
                 flight_reservation.delay(pk)
                 return Response(TicketSerializer(updated_ticket).data,
                             status=status.HTTP_200_OK)
@@ -171,6 +191,8 @@ class TicketViewSet(viewsets.ModelViewSet):
                     data={"message":"Flight object not found"},
                     status=status.HTTP_404_NOT_FOUND)
         else:
+            flight_decline.delay(pk)
             return Response(data={
                 "message": "Confirmation declined"
             },status=status.HTTP_200_OK)
+
