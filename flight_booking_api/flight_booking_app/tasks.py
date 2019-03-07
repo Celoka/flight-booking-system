@@ -101,7 +101,7 @@ def flight_decline(pk):
     queryset = Ticket.objects.all()
     ticket = get_object_or_404(queryset, pk=int(pk))
     if ticket:
-       subject, from_email, to = 'Your Flight Status', settings.EMAIL_HOST_USER, ticket.user.email
+        subject, from_email, to = 'Your Flight Status', settings.EMAIL_HOST_USER, ticket.user.email
         html_content = render_to_string('flight_decline.html',{
             'name': ticket.user.get_full_name(),
             'flight_number': ticket.flight.flight_number
