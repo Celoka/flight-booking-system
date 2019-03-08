@@ -10,11 +10,9 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-from whitenoise.django import DjangoWhiteNoise
 
 setting = 'flight_booking_api.settings.development'
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', setting)
 
 application = get_wsgi_application()
-application = DjangoWhiteNoise(application)
