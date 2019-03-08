@@ -11,7 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-setting = 'flight_booking_api.settings.development'
+if os.getenv('ENV') == 'PRODUCTION':
+    setting = 'flight_booking_api.settings.production'
+else:
+    setting = 'flight_booking_api.settings.development'
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', setting)
 

@@ -4,7 +4,11 @@ import sys
 from dotenv import load_dotenv
 
 load_dotenv()
-setting = 'flight_booking_api.settings.development'
+
+if os.getenv('ENV') == 'PRODUCTION':
+    setting = 'flight_booking_api.settings.production'
+else:
+    setting = 'flight_booking_api.settings.development'
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', setting)
