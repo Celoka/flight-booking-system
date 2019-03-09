@@ -5,7 +5,10 @@ from django.conf import settings
 from celery import Celery
 
 
-setting = 'flight_booking_api.settings.development'
+if os.getenv('ENV') == 'PRODUCTION':
+    setting = 'flight_booking_api.settings.production'
+else:
+    setting = 'flight_booking_api.settings.development'
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', setting)
