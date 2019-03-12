@@ -170,8 +170,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 # CELERY STUFF
-BROKER_URL = os.getenv('AMQ_URL')
-CELERY_RESULT_BACKEND = os.getenv('AMQ_URL')
+BROKER_URL = os.getenv('AMQP_URL')
+CELERY_RESULT_BACKEND = os.getenv('AMQP_URL')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
