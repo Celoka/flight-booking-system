@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-if os.getenv('ENV') == 'PRODUCTION':
+if os.environ['ENV'] in ['PRODUCTION']:
     setting = 'flight_booking_api.settings.production'
 else:
     setting = 'flight_booking_api.settings.development'
