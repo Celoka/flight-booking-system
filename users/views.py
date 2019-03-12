@@ -30,6 +30,7 @@ class RegisterUserView(generics.CreateAPIView):
     POST auth/register
     """
     permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -62,6 +63,7 @@ class LoginView(generics.CreateAPIView):
     Post auth/login
     """
     permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
     serializer_class   = UserLoginSerializer
 
     queryset = User.objects.all()
