@@ -11,4 +11,4 @@ DEBUG = False
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
+DATABASES['default'] = dj_database_url.config(default=os.getenv('POSTGRES_URL'))
