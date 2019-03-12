@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import login
 
 from rest_framework import generics,permissions,exceptions
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.views import status,APIView
 from rest_framework.exceptions import ParseError
@@ -23,6 +24,15 @@ from .serializers import (UserSerializer,
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny, ))
+def index(request,*args,**kwargs):
+    return Response(data={
+               'message': 'Welcome to flight booking system'
+            },
+            status=status.HTTP_200_OK)
 
 
 class RegisterUserView(generics.CreateAPIView):
@@ -100,6 +110,8 @@ class ImageUploadViewSet(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = ImageUploadSerializer
+    queryset = User.objects.all()
+    serializer_class = ImageUploadSerializer
 
     def post(self, request, *args, **kwargs):
         try:
@@ -116,10 +128,51 @@ class ImageUploadViewSet(APIView):
             },
             status=status.HTTP_201_CREATED)
 
+    def get(self, request, *args, **kwargs):
+        pk=kwargs["pk"]
+        try:
+            user = self.queryset.get(pk=pk)
+            serializer = ImageUploadSerializer(user)
+            return Response(data={
+                "message": "Success",
+                "data":serializer.data
+            },
+            status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(
+                data={"message":"User object not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs["pk"]
+        data = request.data.get("photo")
+        if data is None or data == "":
+            raise exceptions.ValidationError("Field must not be empty")
+        try:
+            user = self.queryset.get(pk=pk)
+            serializer = ImageUploadSerializer()
+            updated_photo = serializer.update(user, data)
+            return Response(data={
+                "message": "Update was successful",
+                "data": ImageUploadSerializer(updated_photo).data
+            },
+            status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(
+                data={"message":"User object not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
     def delete(self,request, *args, **kwargs):
-        user = request.user
-        user.photo.delete(save=True)
-        return Response(data={
+        pk=kwargs["pk"]
+        try:
+            user = self.queryset.get(pk=pk)
+            user.photo.delete(save=True)
+            serializer = ImageUploadSerializer(user)
+            return Response(data={
                 "message": "Delete successful"
             },
             status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            return Response(
+                data={"message":"User object not found"},
+                status=status.HTTP_404_NOT_FOUND)
