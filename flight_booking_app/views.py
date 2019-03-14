@@ -125,7 +125,7 @@ class TicketViewSet(viewsets.ModelViewSet):
         flight = get_object_or_404(queryset, pk=data['flight'])
         ticket = Ticket.objects.filter(user=user, flight=flight)
         if ticket.exists():
-            return Response(data={"A ticket already exists"},
+            return Response(data={"message":"A ticket already exists"},
                             status=status.HTTP_409_CONFLICT)
         if flight:
             new_ticket = dict(
@@ -164,11 +164,11 @@ class TicketViewSet(viewsets.ModelViewSet):
     
         if data['confirm_payment'] == Ticket.YES:
             if user != ticket.user:
-                return Response(data={"User is not authorized to perform this operation"},
+                return Response(data={"message":"User is not authorized to perform this operation"},
                                 status=status.HTTP_401_UNAUTHORIZED)
 
             if ticket.status == ticket.RESERVED:
-                return Response(data={"This flight has been reserved"},
+                return Response(data={"message":"This flight has been reserved"},
                                 status=status.HTTP_409_CONFLICT)
             try:
                 flight_number = ticket.flight.flight_number

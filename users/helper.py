@@ -22,7 +22,7 @@ def validate_password(password):
     if re.search(r'(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$_!%*?&]{8,}$)', password) is not None:
         return password
     raise serializers.ValidationError(
-        'Password must have at least 1 uppercase, 1 lowercase, 1 number & 1 special character and it should have minimum of 8 characters'
+        'Password must be a lowercase, an uppercase, a number & a special character. It should be 8 character'
     )
 
 def validate_non_empty_input(first_name,last_name,
