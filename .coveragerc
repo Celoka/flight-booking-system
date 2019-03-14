@@ -1,0 +1,13 @@
+
+[run]
+omit =
+    */settings/*
+    */migrations/*
+    */wsgi.py
+    */celery.py
+    */apps.py
+    */tasks.py
+    */venv/*
+    */.vscode/*
+    */__init__.py
+    manage.py

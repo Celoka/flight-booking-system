@@ -99,7 +99,7 @@ class LoginView(generics.CreateAPIView):
                     },
                     status=status.HTTP_200_OK)
         return Response(data={
-            "error":"Unauthorized operation"
+            "message":"User does not exist"
         },
         status=status.HTTP_401_UNAUTHORIZED)
 

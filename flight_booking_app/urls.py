@@ -7,8 +7,8 @@ from .views import FlightViewSet,TicketViewSet
 
 router = DefaultRouter()
 
-router.register('ticket', TicketViewSet, base_name='tickets')
-router.register('flight', FlightViewSet, base_name='flights')
+router.register('ticket', TicketViewSet)
+router.register('flight', FlightViewSet)
 
 urlpatterns = [
     path('', include(router.urls))
