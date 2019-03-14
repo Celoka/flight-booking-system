@@ -1,0 +1,25 @@
+language: python
+python:
+  - "3.7.2"
+
+services:
+  - postgresql
+  - rabitmq
+
+env:
+  - DJANGO=2.1.7
+
+before_install:
+  - export DJANGO_SETTINGS_MODULE=flight_booking_api.settings.testing
+  - export PYTHONPATH=$HOME/builds/Celoka/flight_booking_system
+
+install:
+  - pip install -r requirements.txt
+  - pip install psycopg2 --quiet
+
+before_script:
+  - psql -c "CREATE DATABASE flight_booking_app_test;" -U postgres
+
+script:
+  - sh ./build.sh
+  - coveralls
