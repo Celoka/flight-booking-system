@@ -89,6 +89,10 @@ coverage report
 - Make Flight Reservation
 - Check Flight Status
 
+## API Documentation
+- The API is documented with Postman. See the [API Doc](https://documenter.getpostman.com/view/2103043/S17nTVmm) for details.
+
+
 ## Built With
 - Python 3
 - Postgresql

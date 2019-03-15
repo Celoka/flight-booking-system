@@ -114,15 +114,15 @@ class ImageUploadViewSet(APIView):
     serializer_class = ImageUploadSerializer
 
     def post(self, request, *args, **kwargs):
-        try:
-            photo = request.data.get('photo')
-        except KeyError:
-            return ParseError('Photo field cannot be empty')
-        user = request.user
-        user.photo = photo
-        user.save()
-        serializer = ImageUploadSerializer(user)
-        return Response(data={
+        data = request.data.get('photo')
+        if data is None or data == "":
+            raise exceptions.ValidationError("Field must not be empty")
+        else:
+            user = request.user
+            user.photo = data
+            user.save()
+            serializer = ImageUploadSerializer(user)
+            return Response(data={
                 "message": "Successful Upload",
                 "data":serializer.data
             },
@@ -167,7 +167,6 @@ class ImageUploadViewSet(APIView):
         try:
             user = self.queryset.get(pk=pk)
             user.photo.delete(save=True)
-            serializer = ImageUploadSerializer(user)
             return Response(data={
                 "message": "Delete successful"
             },
