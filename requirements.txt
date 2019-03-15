@@ -12,6 +12,8 @@ certifi==2019.3.9
 chardet==3.0.4
 Click==7.0
 colorama==0.3.9
+coverage==4.5.3
+coveralls==1.6.0
 dj-database-url==0.5.0
 Django==2.1.7
 django-celery==3.2.2
@@ -40,7 +42,7 @@ PyJWT==1.7.1
 python-dateutil==2.8.0
 python-dotenv==0.10.1
 pytz==2018.9
-pyyaml>=4.2b1
+PyYAML==5.1
 redis==3.2.0
 requests==2.20.1
 s3transfer==0.2.0
@@ -48,6 +50,7 @@ semantic-version==2.5.0
 six==1.11.0
 termcolor==1.1.0
 texttable==0.9.1
+urllib3==1.24.1
 vine==1.2.0
 wcwidth==0.1.7
 websocket-client==0.55.0
