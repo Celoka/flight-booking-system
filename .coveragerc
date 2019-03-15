@@ -11,3 +11,4 @@ omit =
     */.vscode/*
     */__init__.py
     manage.py
+    locustfile.py

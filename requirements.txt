@@ -28,12 +28,20 @@ docker-pycreds==0.4.0
 dockerpty==0.4.1
 docopt==0.6.2
 docutils==0.14
+Flask==1.0.2
 future==0.16.0
+gevent==1.4.0
+greenlet==0.4.15
 gunicorn==19.9.0
 idna==2.7
+itsdangerous==1.1.0
+Jinja2==2.10
 jmespath==0.9.4
 jsonschema==2.6.0
 kombu==4.3.0
+locustio==0.11.0
+MarkupSafe==1.1.1
+msgpack==0.6.1
 pathspec==0.5.9
 Pillow==5.4.1
 psycopg2==2.7.7
@@ -43,6 +51,7 @@ python-dateutil==2.8.0
 python-dotenv==0.10.1
 pytz==2018.9
 PyYAML==5.1
+pyzmq==18.0.1
 redis==3.2.0
 requests==2.20.1
 s3transfer==0.2.0
@@ -54,4 +63,5 @@ urllib3==1.24.1
 vine==1.2.0
 wcwidth==0.1.7
 websocket-client==0.55.0
+Werkzeug==0.14.1
 whitenoise==4.1.2
