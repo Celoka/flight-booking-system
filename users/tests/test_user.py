@@ -38,7 +38,18 @@ def upload_a_file(photo=""):
 class BaseViewTest(APITestCase):
     pass
 
+
+class TestHomeRoute(APITestCase):
+
+    def test_home_route(self):
+        url = reverse("home-route", kwargs={"version": "v1"})
+        response = client.get(url,content_type='application/json')
+        self.assertEqual(response.data["message"], 'Welcome to flight booking system')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
 class UserModelTest(APITestCase):
+
     def setUp(self):
         self.a_user = User.objects.create_user(
             username="Luska",
@@ -47,14 +58,16 @@ class UserModelTest(APITestCase):
             email="eloka.chima@email.com",
             password="EUROCKF$1"
         )
-    
+  
     def test_user_is_created(self):
         self.assertEqual(self.a_user.username, "Luska")
         self.assertEqual(self.a_user.first_name, "Eloka")
         self.assertEqual(self.a_user.last_name, "Chima")
         self.assertEqual(self.a_user.email, "eloka.chima@email.com")
-    
+
+
 class RegisterUserTest(TestCase):
+
     def setUp(self):
         self.valid_credentials = {
             "username": "West",
@@ -68,7 +81,7 @@ class RegisterUserTest(TestCase):
             "first_name": "John",
             "password": "2"
         }
-    
+
     def test_register_a_user(self):
         url = reverse("auth-register", kwargs={"version": "v1"})
         response = client.post(url, data=json.dumps(self.valid_credentials), 
@@ -78,14 +91,14 @@ class RegisterUserTest(TestCase):
         self.assertEqual(response.data["last_name"],"John")
         self.assertEqual(response.data["email"],"west.john@email.com")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-  
+
     def test_invalid_user_password(self):
         url = reverse("auth-register",kwargs={"version": "v1"})
         response = client.post(url, data=json.dumps(self.bad_format_details),
                                content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data[0], 'Password must be a lowercase, an uppercase, a number & a special character. It should be 8 character')
-    
+        self.assertEqual(response.data[0], 'Password contain a lowercase, an uppercase, a number & a special character and should be atleast 8 characters long')
+
     def test_valid_user_name(self):
         url = reverse("auth-register",kwargs={"version": "v1"})
         invalid_credentials = {
@@ -102,6 +115,7 @@ class RegisterUserTest(TestCase):
 
 
 class LoginUSerTest(BaseViewTest):
+
     def setUp(self):
         self.valid_credentials = dict(
             username='West',
@@ -140,7 +154,7 @@ class LoginUSerTest(BaseViewTest):
             content_type="application/json"
         )
         self.assertEqual(response.data[0], "Enter a valid login credential")
-    
+
     def test_user_login_with_wrong_credential(self):
         wrong_credentials = dict(
             username='tes',
@@ -154,6 +168,7 @@ class LoginUSerTest(BaseViewTest):
         )
         self.assertEqual(response.data['message'], "User does not exist")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class FileUpload(BaseViewTest):
     """
@@ -185,6 +200,15 @@ class FileUpload(BaseViewTest):
         response = upload_a_file()
         self.assertEqual(response.data["message"], "Successful Upload")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+ 
+    def test_photo_no_empty_photo_field(self):
+        url = reverse("file-upload",
+                kwargs={"version": "v1"}
+            )
+        data = {"": ""}
+        response = client.post(url,data,format="multipart")
+        self.assertEqual(response.data[0], 'Field must not be empty')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_empty_field_update_photo(self):
         def upload_a_file(photo=""):
@@ -200,7 +224,7 @@ class FileUpload(BaseViewTest):
         response = upload_a_file()
         self.assertEqual(response.data[0], "Field must not be empty")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_photo_update(self):
         def upload_file(photo=""):
             url = reverse(
@@ -213,9 +237,46 @@ class FileUpload(BaseViewTest):
             image = Image.new('RGB', (100, 100))
             tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
             image.save(tmp_file)
-
-            {"photo":tmp_file}
             return client.delete(url, {"photo":tmp_file}, format="multipart")
         response = upload_file()
         self.assertEqual(response.data["message"], "Delete successful")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_get_user_photo(self):
+        upload_a_file()
+        url = reverse("file-upload-detail",
+                kwargs={"version": "v1","pk": self.user.data['id']}
+            )
+        response = client.get(url,format="multipart")
+        self.assertEqual(response.data['message'], 'Success')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_does_not_exist_when_get_request_is_made(self):
+        url = reverse("file-upload-detail",
+                kwargs={"version": "v1","pk": 100}
+            )
+        response = client.get(url,format="multipart")
+        self.assertEqual(response.data['message'], 'User object not found')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_user_does_not_exist_when_updating(self):
+        def upload_a_file(photo=""):
+            url = reverse(
+                "file-upload-detail",
+                kwargs={
+                    "version": "v1",
+                    "pk": 100
+                }
+            )
+            image = Image.new('RGB', (100, 100))
+            tmp_file = tempfile.NamedTemporaryFile(suffix='.jpg')
+            image.save(tmp_file)
+
+            return client.put(
+                url,
+                {"photo":tmp_file},
+                format="multipart"       
+        )
+        response = upload_a_file()
+        self.assertEqual(response.data['message'], 'User object not found')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

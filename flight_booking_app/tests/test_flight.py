@@ -34,6 +34,7 @@ class FlightModelTest(APITestCase):
         self.assertEqual(self.a_flight.destination, "London")
 
 class TicketModelTest(APITestCase):
+
     def setUp(self):
         self.a_flight = Flight.objects.create(
             flight_number="Fx-ggfg",
@@ -65,6 +66,7 @@ class TicketModelTest(APITestCase):
             departure="Lagos",
             destination="London"
         )
+
     def test_a_ticket(self):
         self.assertEqual(self.a_ticket.flight.flight_number, 'Fx-ggfg')
         self.assertEqual(self.a_ticket.ticket_id, "75753")
@@ -78,10 +80,10 @@ class TicketModelTest(APITestCase):
         self.assertEqual(self.a_ticket.depart_date, "2018-02-13")
         self.assertEqual(self.a_ticket.arrive_date, "2018-02-14")
 
-
 # test for views
 
 class BaseViewTest(APITestCase):
+
     client = APIClient()
 
     @staticmethod
@@ -97,7 +99,7 @@ class BaseViewTest(APITestCase):
             departure=departure,
             destination=destination,
             amount=amount)
-    
+
     def login_client(self, username="", password=""):
         # get a token from DRF
         response = self.client.post(
@@ -119,7 +121,6 @@ class BaseViewTest(APITestCase):
         return self.token
 
     def setUp(self):
-
         # create a admin user
         self.user = User.objects.create_superuser(
             username="test_user",
@@ -165,6 +166,7 @@ class GetASingleFlightTest(BaseViewTest):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
 class GetAllFlightTest(BaseViewTest):
 
     def test_admin_create_flight(self):
@@ -200,7 +202,7 @@ class GetAllFlightTest(BaseViewTest):
         serialized = FlightSerializer(expected, many=True)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_update_a_flight(self):
         """
         This test ensures that a single flight can be updated.
