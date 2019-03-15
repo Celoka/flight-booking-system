@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/Celoka/flight_booking_system.svg?branch=master)](https://travis-ci.org/Celoka/flight_booking_system)
-[![Coverage Status](https://coveralls.io/repos/github/Celoka/flight_booking_system/badge.svg?branch=integrate_ci)](https://coveralls.io/github/Celoka/flight_booking_system?branch=integrate_ci)
+[![Coverage Status](https://coveralls.io/repos/github/Celoka/flight_booking_system/badge.svg?branch=master)](https://coveralls.io/github/Celoka/flight_booking_system?branch=master)
 
 # Flight Booking System
 This repository contains the API endpoints of Airtech Services. This enables users to be authenticated and authorized before booking a flight ticket, purchase tickets, make flight reservations amongst others. This project is built using Django rest framework. 
