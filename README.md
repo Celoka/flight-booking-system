@@ -2,7 +2,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/Celoka/flight_booking_system/badge.svg?branch=master)](https://coveralls.io/github/Celoka/flight_booking_system?branch=master)
 
 # Flight Booking System
-This repository contains the API endpoints of Airtech Services. This enables users to be authenticated and authorized before booking a flight ticket, purchase tickets, make flight reservations amongst others. This project is built using Django rest framework. 
+This repository contains the API endpoints of Airtech Services. This enables users to be authenticated and authorized before booking a flight ticket, purchase tickets, make flight reservations amongst others. This project is built using Django rest framework.
+
+The url to the API could be found [here](https://flightbookingapp.herokuapp.com/api/v1/)
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
