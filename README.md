@@ -41,7 +41,7 @@ deactivate
 
 - Create a `.env` file, copy the variables in the `.env_sample` in the root directory of the project and set up the configurations according to your system.
 
-- Ensure to create makemigrations then migrate by running the following commands sequencially:
+- Ensure to makemigrations then migrate by running the following commands sequencially:
 ```
 - python manage.py makemigrations
 
@@ -73,7 +73,7 @@ python manage.py test
 
 - Test coverage:
 ```
-coverage run manager.py
+coverage run manage.py test
 ```
 
 - Coverage report:
