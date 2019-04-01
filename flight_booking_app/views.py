@@ -3,16 +3,16 @@ from datetime import datetime,timedelta
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
-from rest_framework import viewsets,serializers,exceptions
+from rest_framework import viewsets,exceptions
 from rest_framework.views import status
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 
 from .serializer import (FlightSerializer,
                         TicketSerializer)
 from .tasks import (ticket_notification,
-                        flight_reservation,
-                        flight_decline)
+                    flight_reservation,
+                    flight_decline)
 from .helper import (validate_request_data, 
                     convert_date)
 from .models import Flight,Ticket
@@ -27,7 +27,6 @@ class FlightViewSet(viewsets.ModelViewSet):
     PUT flight/:pk/
     DELETE flight/:pk/
     """
-
     serializer_class = FlightSerializer
     queryset = Flight.objects.all()
 
@@ -100,6 +99,7 @@ class FlightViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK)
 
+
 class TicketViewSet(viewsets.ModelViewSet):
     """
     POST ticket/
@@ -108,7 +108,6 @@ class TicketViewSet(viewsets.ModelViewSet):
     PUT  ticket/:pk/
     DELETE ticket/:pk/
     """
-    
     serializer_class = TicketSerializer
     queryset = Ticket.objects.all()
 
@@ -195,4 +194,3 @@ class TicketViewSet(viewsets.ModelViewSet):
             return Response(data={
                 "message": "Confirmation declined"
             },status=status.HTTP_200_OK)
-

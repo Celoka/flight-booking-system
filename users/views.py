@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from django.contrib.auth import login
 
 from rest_framework import generics,permissions,exceptions
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.views import status,APIView
-from rest_framework.exceptions import ParseError
 from rest_framework_jwt.settings import api_settings
 from rest_framework.parsers import MultiPartParser,FormParser
 
@@ -13,7 +11,6 @@ from .models import User
 from .helper import (check_if_exist,
                     validate_username,
                     validate_password,
-                    validate_non_empty_input,
                     validate_login_input)
 
 from .serializers import (UserSerializer,
@@ -27,7 +24,7 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny, ))
+@permission_classes((permissions.AllowAny,))
 def index(request,*args,**kwargs):
     return Response(data={
                'message': 'Welcome to flight booking system'
@@ -45,11 +42,10 @@ class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
 
     def post(self, request, *args, **kwargs):
-        username   = request.data.get("username", "default")
-        first_name = request.data.get("first_name", "")
-        last_name  = request.data.get("last_name", "")
-        email      = request.data.get("email", "default")
-        password   = request.data.get("password", "")
+        data = request.data
+        username = data["username"]
+        password = data["password"]
+        email = data.get("email")
 
         validate_username(username)
         validate_password(password)
@@ -57,8 +53,8 @@ class RegisterUserView(generics.CreateAPIView):
 
         new_user = User.objects.create_user(
             username=username,
-            first_name=first_name,
-            last_name=last_name,
+            first_name=data["first_name"],
+            last_name=data["last_name"],
             email=email,
             password=password
         )
@@ -70,12 +66,11 @@ class RegisterUserView(generics.CreateAPIView):
 
 class LoginView(generics.CreateAPIView):
     """
-    Post auth/login
+    POST auth/login
     """
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
-    serializer_class   = UserLoginSerializer
-
+    serializer_class = UserLoginSerializer
     queryset = User.objects.all()
 
     def post(self, request, *args, **kwargs):
@@ -105,13 +100,12 @@ class LoginView(generics.CreateAPIView):
 
 class ImageUploadViewSet(APIView):
     """
-    User image upload
+    User Image Upload
     """
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = ImageUploadSerializer
     queryset = User.objects.all()
-    serializer_class = ImageUploadSerializer
 
     def post(self, request, *args, **kwargs):
         data = request.data.get('photo')

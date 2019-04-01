@@ -25,17 +25,6 @@ def validate_password(password):
         'Password contain a lowercase, an uppercase, a number & a special character and should be atleast 8 characters long'
     )
 
-def validate_non_empty_input(first_name,last_name,
-                            password,username=None,
-                            email=None):
-    """
-    Ensure input fields are not empty
-    """
-    if not first_name and not username and not \
-            last_name and not \
-                email and not password:
-        raise serializers.ValidationError('first_name,last_name, username, email and password are required to register a user')
-
 def check_if_exist(email,username):
     """
     Validate email and username
