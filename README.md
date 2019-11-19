@@ -35,7 +35,7 @@ deactivate
 ```
 ### Installing
 - Clone this repository
-> https://github.com/Celoka/flight_booking_system.git
+> https://github.com/Celoka/flight-booking-system.git
 
 - Cd into the cloned app, create a virtualenv and activate(see instruction above for steps to create a virtualenv)
 
