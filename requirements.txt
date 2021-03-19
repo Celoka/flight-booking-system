@@ -20,7 +20,7 @@ django-celery==3.2.2
 django-heroku==0.3.1
 django-money==0.14.4
 django-storages==1.7.1
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 djangorestframework-jwt==1.11.0
 docker==3.7.0
 docker-compose==1.23.2
